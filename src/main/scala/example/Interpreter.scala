@@ -2,7 +2,7 @@ package example
 
 // typed embedding of µkanren in scala
 // programs are guaranteed to be well-formed
-object Hello {
+object Interpreter {
 
   // tagged representation of terms
   enum Term[+T]:
