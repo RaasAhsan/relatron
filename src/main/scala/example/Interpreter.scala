@@ -2,7 +2,7 @@ package example
 
 // typed embedding of µkanren in scala
 // programs are guaranteed to be well-formed
-object Interpreter extends FreshBoilerplate {
+object Interpreter extends Boilerplate {
 
   // tagged representation of terms
   enum Term[+T]:
@@ -34,7 +34,7 @@ object Interpreter extends FreshBoilerplate {
 
     def ||(that: => Goal): Goal = Disj(this, () => that)
 
-  def fresh[T](unary: Term[T] => Goal): Goal =
+  def callFresh[T](unary: Term[T] => Goal): Goal =
     Goal.Fresh(unary)
 
   def succeed: Goal =
@@ -106,29 +106,6 @@ object Interpreter extends FreshBoilerplate {
 
     val init = State(0, Map())
     go(goal, init)
-  }
-  
-  // Generate boilerplate with macros or source generators
-  def run[A: Reify](f: Term[A] => Goal): LazyList[A] = {
-    val goal = fresh[A] { a =>
-      f(a)
-    }
-
-    run(goal).map { state =>
-      state.reify[A](0)
-    }
-  }
-
-  def run[A: Reify, B: Reify](f: (Term[A], Term[B]) => Goal): LazyList[(A, B)] = {
-    val goal = fresh[A] { a =>
-      fresh[B] { b =>
-        f(a, b)
-      }
-    }
-
-    run(goal).map { state =>
-      state.reify[A](0) -> state.reify[B](1)
-    }
   }
 
   enum Nat:
@@ -216,13 +193,13 @@ object Interpreter extends FreshBoilerplate {
     //   append(cons(int(1), cons(int(2), cons(int(3), nil))), x, cons(int(1), cons(int(2), cons(int(3), cons(int(4), cons(int(5), nil))))))
     // }
 
-    // val r2 = run[Nat] { x =>
-    //   lte(x, succ(succ(succ(succ(succ(succ(zero)))))))
-    // }
-
-    val r2 = run[List[Int]] { x =>
-      reverse(x, cons(int(1), cons(int(2), cons(int(3), nil))))
+    val r2 = run[Nat] { x =>
+      lte(zero, x)
     }
+
+    // val r2 = run[List[Int]] { x =>
+    //   reverse(x, cons(int(1), cons(int(2), cons(int(3), nil))))
+    // }
 
     println(r2.take(10).toList)
   }

@@ -9,8 +9,10 @@ lazy val root = (project in file("."))
   .settings(
     name := "relprog",
     Compile / sourceGenerators += Def.task {
-      val file = (Compile / sourceManaged).value / "boilerplate" / "FreshBoilerplate.scala"
-      IO.write(file, Boilerplate.fresh)
-      Seq(file)
+      val fresh = (Compile / sourceManaged).value / "boilerplate" / "FreshBoilerplate.scala"
+      val run = (Compile / sourceManaged).value / "boilerplate" / "RunBoilerplate.scala"
+      IO.write(fresh, Boilerplate.fresh)
+      IO.write(run, Boilerplate.run)
+      Seq(fresh, run)
     }
   )
