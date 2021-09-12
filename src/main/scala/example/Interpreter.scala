@@ -210,6 +210,14 @@ object Interpreter {
         x === cons(h, t) && xy === cons(h, ty) && append(t, y, ty)
       }
 
+  def reverse[A](x: Term[List[A]], y: Term[List[A]]): Goal =
+    (x === nil[A] && y === nil[A]) ||
+      fresh[A, List[A]] { (h, t) =>
+        x === cons(h, t) && fresh[List[A]] { at =>
+          append(at, cons(h, nil), y) && reverse(t, at)
+        }
+      }
+
   def main(args: Array[String]): Unit = {
     // val r1 = run[Nat] { x =>
     //   fresh[Nat, Nat] { (y, z) => 
@@ -223,8 +231,12 @@ object Interpreter {
     //   append(cons(int(1), cons(int(2), cons(int(3), nil))), x, cons(int(1), cons(int(2), cons(int(3), cons(int(4), cons(int(5), nil))))))
     // }
 
-    val r2 = run[Nat] { x =>
-      lte(x, succ(succ(succ(succ(succ(succ(zero)))))))
+    // val r2 = run[Nat] { x =>
+    //   lte(x, succ(succ(succ(succ(succ(succ(zero)))))))
+    // }
+
+    val r2 = run[List[Int]] { x =>
+      reverse(x, cons(int(1), cons(int(2), cons(int(3), nil))))
     }
 
     println(r2.take(10).toList)
