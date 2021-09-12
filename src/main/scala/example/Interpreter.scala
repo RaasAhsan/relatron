@@ -2,7 +2,7 @@ package example
 
 // typed embedding of µkanren in scala
 // programs are guaranteed to be well-formed
-object Interpreter {
+object Interpreter extends FreshBoilerplate {
 
   // tagged representation of terms
   enum Term[+T]:
@@ -36,22 +36,6 @@ object Interpreter {
 
   def fresh[T](unary: Term[T] => Goal): Goal =
     Goal.Fresh(unary)
-
-  def fresh[A, B](binary: (Term[A], Term[B]) => Goal): Goal =
-    fresh[A] { a =>
-      fresh[B] { b =>
-        binary(a, b)
-      }
-    }
-
-  def fresh[A, B, C](tri: (Term[A], Term[B], Term[C]) => Goal): Goal =
-    fresh[A] { a =>
-      fresh[B] { b =>
-        fresh[C] { c => 
-          tri(a, b, c)
-        }
-      }
-    }
 
   def succeed: Goal =
     () === Term.Value(())
@@ -123,7 +107,8 @@ object Interpreter {
     val init = State(0, Map())
     go(goal, init)
   }
-
+  
+  // Generate boilerplate with macros or source generators
   def run[A: Reify](f: Term[A] => Goal): LazyList[A] = {
     val goal = fresh[A] { a =>
       f(a)
