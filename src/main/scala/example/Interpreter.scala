@@ -108,47 +108,6 @@ object Interpreter extends Syntax {
     go(goal, init)
   }
 
-  enum Nat:
-    case Z()
-    case S(n: Nat)
-
-  def zero: Term[Nat] = 
-    Term.Value(())
-
-  def succ(k: Term[Nat]): Term[Nat] =
-    Term.Pair(k, Term.Value(()))
-
-  given natReify: Reify[Nat] with
-    def reify(term: Term[Nat], walk: [A] => Term[A] => Term[A]): Nat =
-      walk(term) match {
-        case Term.Value(()) => Nat.Z()
-        case Term.Pair(t, _) => Nat.S(reify(t.asInstanceOf[Term[Nat]], walk))
-        case Term.Variable(_) => throw new RuntimeException("unbound variable")
-        case _ => throw new RuntimeException("invalid reification")
-      }
-
-  def plus(a: Term[Nat], b: Term[Nat], c: Term[Nat]): Goal = {
-    (a === zero && b === c) ||
-      fresh[Nat, Nat] { (pa, pc) =>
-        a === succ(pa) && c === succ(pc) && plus(pa, b, pc)
-      }
-    }
-
-  def lte(a: Term[Nat], b: Term[Nat]): Goal =
-    a === zero || 
-      fresh[Nat, Nat] { (sa, sb) =>
-        a === succ(sa) && b === succ(sb) && lte(sa, sb)
-      }
-
-  def nil[A]: Term[List[A]] =
-    Term.Value(())
-
-  def cons[A](head: Term[A], tail: Term[List[A]]): Term[List[A]] =
-    Term.Pair(head, tail)
-
-  def ::#[A](head: Term[A], tail: Term[List[A]]): Term[List[A]] =
-    cons(head, tail)
-
   given intReify: Reify[Int] with
     def reify(term: Term[Int], walk: [A] => Term[A] => Term[A]): Int =
       walk(term) match {
@@ -157,30 +116,10 @@ object Interpreter extends Syntax {
         case _ => throw new RuntimeException("invalid reification")
       }
 
-  given listReify[A](using RA: Reify[A]): Reify[List[A]] with
-    def reify(term: Term[List[A]], walk: [A] => Term[A] => Term[A]): List[A] =
-      walk(term) match {
-        case Term.Value(()) => Nil
-        case Term.Pair(h, t) => RA.reify(h.asInstanceOf[Term[A]], walk) :: reify(t.asInstanceOf[Term[List[A]]], walk)
-        case Term.Variable(_) => throw new RuntimeException("unbound variable")
-        case _ => throw new RuntimeException("invalid reification")
-      }
-
-  def append[A](x: Term[List[A]], y: Term[List[A]], xy: Term[List[A]]): Goal =
-    (x === nil[A] && y === xy) ||
-      fresh[A, List[A], List[A]] { (h, t, ty) =>
-        x === cons(h, t) && xy === cons(h, ty) && append(t, y, ty)
-      }
-
-  def reverse[A](x: Term[List[A]], y: Term[List[A]]): Goal =
-    (x === nil[A] && y === nil[A]) ||
-      fresh[A, List[A]] { (h, t) =>
-        x === cons(h, t) && fresh[List[A]] { at =>
-          append(at, cons(h, nil), y) && reverse(t, at)
-        }
-      }
-
   def main(args: Array[String]): Unit = {
+    import Lists.{given, *}
+    import Nats.{given, *}
+
     // val r1 = run[Nat] { x =>
     //   fresh[Nat, Nat] { (y, z) => 
     //     z === zero && y === succ(zero) && plus(z, x, y)
@@ -189,13 +128,13 @@ object Interpreter extends Syntax {
 
     // println(r1.take(10).toList)
 
-    // val r2 = run[List[Int]] { x =>
-    //   append(cons(int(1), cons(int(2), cons(int(3), nil))), x, cons(int(1), cons(int(2), cons(int(3), cons(int(4), cons(int(5), nil))))))
-    // }
-
-    val r2 = run[Nat] { x =>
-      lte(zero, x)
+    val r2 = run[List[Int], List[Int]] { (x, y) =>
+      append(x, y, cons(int(1), cons(int(2), cons(int(3), cons(int(4), cons(int(5), nil))))))
     }
+
+    // val r2 = run[Nat] { x =>
+    //   lte(zero, x)
+    // }
 
     // val r2 = run[List[Int]] { x =>
     //   reverse(x, cons(int(1), cons(int(2), cons(int(3), nil))))
