@@ -14,5 +14,9 @@ lazy val root = (project in file("."))
       IO.write(fresh, Boilerplate.fresh)
       IO.write(run, Boilerplate.run)
       Seq(fresh, run)
-    }
+    },
+    libraryDependencies ++= Seq(
+      MUnit.core % Test,
+      MUnit.scalacheck % Test
+    )
   )

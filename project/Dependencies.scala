@@ -1,5 +1,9 @@
 import sbt._
 
 object Dependencies {
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.2.8"
+  object MUnit {
+    val version = "0.7.29"
+    val core = "org.scalameta" %% "munit" % version
+    val scalacheck = "org.scalameta" %% "munit-scalacheck" % version
+  }
 }
