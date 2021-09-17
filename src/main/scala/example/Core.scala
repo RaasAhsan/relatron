@@ -51,12 +51,13 @@ object Core extends Syntax {
     def reify[T: Reify](index: Int): T =
       reify(subst.get(index).get.asInstanceOf[Term[T]])
 
-    def reify[T](term: Term[T])(using RT: Reify[T]): T =
-      RT.reify(term, [A] => (tt: Term[A]) => walk[A](self, tt))
+    def reify[T](term: Term[T])(using RT: Reify[T]): T = {
+      RT.reify(walk(this, term))
+    }
   }
 
   trait Reify[T] {
-    def reify(term: Term[T], walk: [A] => Term[A] => Term[A]): T
+    def reify(term: Term[T]): T
   }
 
   def walk[T](state: State, term: Term[T]): Term[T] = {
@@ -67,6 +68,8 @@ object Core extends Syntax {
           .map(_.asInstanceOf[Term[T]])
           .map(t => walk(state, t))
           .getOrElse(term)
+      case Term.Constructor(name, terms) =>
+        Term.Constructor(name, terms.map(t => walk(state, t)))
       case _ => term
     }
   }
@@ -112,8 +115,8 @@ object Core extends Syntax {
   }
 
   given intReify: Reify[Int] with
-    def reify(term: Term[Int], walk: [A] => Term[A] => Term[A]): Int =
-      walk(term) match {
+    def reify(term: Term[Int]): Int =
+      term match {
         case Term.Value(x) => x.asInstanceOf[Int]
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")

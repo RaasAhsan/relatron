@@ -42,15 +42,15 @@ object ArithmeticEvaluator {
     fresh[Node, Node, Node] { (t1, t2, t3) => n === test(t1, t2, t3) }
 
   given nodeReify: Reify[Node] with
-    def reify(term: Term[Node], walk: [A] => Term[A] => Term[A]): Node =
-      walk(term) match {
+    def reify(term: Term[Node]): Node =
+      term match {
         case Term.Constructor("zero", _) => Zero
-        case Term.Constructor("succ", t :: Nil) => Succ(reify(t.asInstanceOf[Term[Node]], walk))
-        case Term.Constructor("pred", t :: Nil) => Pred(reify(t.asInstanceOf[Term[Node]], walk))
-        case Term.Constructor("iszero", t :: Nil) => IsZero(reify(t.asInstanceOf[Term[Node]], walk))
+        case Term.Constructor("succ", t :: Nil) => Succ(reify(t.asInstanceOf[Term[Node]]))
+        case Term.Constructor("pred", t :: Nil) => Pred(reify(t.asInstanceOf[Term[Node]]))
+        case Term.Constructor("iszero", t :: Nil) => IsZero(reify(t.asInstanceOf[Term[Node]]))
         case Term.Constructor("true", _) => True
         case Term.Constructor("false", _) => False
-        case Term.Constructor("if", t1 :: t2 :: t3 :: Nil) => If(reify(t1.asInstanceOf[Term[Node]], walk), reify(t2.asInstanceOf[Term[Node]], walk), reify(t3.asInstanceOf[Term[Node]], walk))
+        case Term.Constructor("if", t1 :: t2 :: t3 :: Nil) => If(reify(t1.asInstanceOf[Term[Node]]), reify(t2.asInstanceOf[Term[Node]]), reify(t3.asInstanceOf[Term[Node]]))
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }

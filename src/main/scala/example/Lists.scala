@@ -25,10 +25,10 @@ object Lists {
       }
   
   given listReify[A](using RA: Reify[A]): Reify[List[A]] with
-    def reify(term: Term[List[A]], walk: [A] => Term[A] => Term[A]): List[A] =
-      walk(term) match {
+    def reify(term: Term[List[A]]): List[A] =
+      term match {
         case Term.Constructor("nil", _) => Nil
-        case Term.Constructor("cons", h :: t :: Nil) => RA.reify(h.asInstanceOf[Term[A]], walk) :: reify(t.asInstanceOf[Term[List[A]]], walk)
+        case Term.Constructor("cons", h :: t :: Nil) => RA.reify(h.asInstanceOf[Term[A]]) :: reify(t.asInstanceOf[Term[List[A]]])
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }
