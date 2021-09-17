@@ -2,7 +2,7 @@ package example
 
 object Lists {
 
-  import Interpreter._
+  import Core._
 
   def nil[A]: Term[List[A]] =
     Term.Value(())

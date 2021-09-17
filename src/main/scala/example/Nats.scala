@@ -2,7 +2,7 @@ package example
 
 object Nats {
   
-  import Interpreter._
+  import Core._
 
   enum Nat:
     case Z()
