@@ -5,10 +5,10 @@ object Lists {
   import Core._
 
   def nil[A]: Term[List[A]] =
-    Term.Value(())
+    Term.Constructor("nil", Nil)
 
   def cons[A](head: Term[A], tail: Term[List[A]]): Term[List[A]] =
-    Term.Pair(head, tail)
+    Term.Constructor("cons", List(head, tail))
 
   def append[A](x: Term[List[A]], y: Term[List[A]], xy: Term[List[A]]): Goal =
     (x === nil[A] && y === xy) ||
@@ -27,8 +27,8 @@ object Lists {
   given listReify[A](using RA: Reify[A]): Reify[List[A]] with
     def reify(term: Term[List[A]], walk: [A] => Term[A] => Term[A]): List[A] =
       walk(term) match {
-        case Term.Value(()) => Nil
-        case Term.Pair(h, t) => RA.reify(h.asInstanceOf[Term[A]], walk) :: reify(t.asInstanceOf[Term[List[A]]], walk)
+        case Term.Constructor("nil", _) => Nil
+        case Term.Constructor("cons", h :: t :: Nil) => RA.reify(h.asInstanceOf[Term[A]], walk) :: reify(t.asInstanceOf[Term[List[A]]], walk)
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }

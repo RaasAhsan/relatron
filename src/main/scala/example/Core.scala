@@ -8,7 +8,7 @@ object Core extends Syntax {
   enum Term[+T]:
     case Variable(index: Int)
     case Value(value: Any)
-    case Pair(left: Term[Any], right: Term[Any])
+    case Constructor(name: String, terms: List[Term[Any]])
 
     def ===[U >: T](that: Term[U]): Goal =
       Goal.Unify(this, that)
@@ -79,9 +79,9 @@ object Core extends Syntax {
       case (Term.Variable(tidx), uwalk) => Some(state.extend(tidx, uwalk))
       case (twalk, Term.Variable(uidx)) => Some(state.extend(uidx, twalk))
       case (Term.Value(tvalue), Term.Value(uvalue)) if tvalue == uvalue => Some(state)
-      case (Term.Pair(ll, lr), Term.Pair(rl, rr)) =>
-        unify(state, ll, rl).flatMap { nextState =>
-          unify(nextState, lr, rr)
+      case (Term.Constructor(n1, ts1), Term.Constructor(n2, ts2)) if n1 == n2 && ts1.length == ts2.length =>
+        ts1.zip(ts2).foldLeft[Option[State]](Some(state)) { case (state, (t1, t2)) =>
+          state.flatMap(s => unify(s, t1, t2))
         }
       case _ => None
     }

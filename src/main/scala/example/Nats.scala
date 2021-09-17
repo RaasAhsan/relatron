@@ -9,16 +9,16 @@ object Nats {
     case S(n: Nat)
 
   def zero: Term[Nat] = 
-    Term.Value(())
+    Term.Constructor("zero", Nil)
 
   def succ(k: Term[Nat]): Term[Nat] =
-    Term.Pair(k, Term.Value(()))
+    Term.Constructor("succ", List(k))
 
   given natReify: Reify[Nat] with
     def reify(term: Term[Nat], walk: [A] => Term[A] => Term[A]): Nat =
       walk(term) match {
-        case Term.Value(()) => Nat.Z()
-        case Term.Pair(t, _) => Nat.S(reify(t.asInstanceOf[Term[Nat]], walk))
+        case Term.Constructor("zero", _) => Nat.Z()
+        case Term.Constructor("succ", t :: Nil) => Nat.S(reify(t.asInstanceOf[Term[Nat]], walk))
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }
