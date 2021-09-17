@@ -59,7 +59,8 @@ object Core extends Syntax {
     def reify(term: Term[T], walk: [A] => Term[A] => Term[A]): T
   }
 
-  def walk[T](state: State, term: Term[T]): Term[T] =
+  def walk[T](state: State, term: Term[T]): Term[T] = {
+    // println(s"walk: $state")
     term match {
       case Term.Variable(index) => 
         state.subst.get(index)
@@ -68,6 +69,7 @@ object Core extends Syntax {
           .getOrElse(term)
       case _ => term
     }
+  }
 
   def unify[T](state: State, t: Term[T], u: Term[T]): Option[State] = {
     // println("---")
@@ -102,6 +104,7 @@ object Core extends Syntax {
         case Goal.Disj(l, r) => 
           // mplus
           go(l, state).lazyAppendedAll(go(r(), state))
+          // go(r(), state).lazyAppendedAll(go(l, state))
       }
 
     val init = State(0, Map())
