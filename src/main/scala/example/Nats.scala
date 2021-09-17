@@ -8,13 +8,22 @@ object Nats {
     case Z()
     case S(n: Nat)
 
+  import Nat._
+
   def zero: Term[Nat] = 
     Term.Constructor("zero", Nil)
 
   def succ(k: Term[Nat]): Term[Nat] =
     Term.Constructor("succ", List(k))
 
-  given natReify: Reify[Nat] with
+  given injectNat: Inject[Nat] with
+    def inject(nat: Nat): Term[Nat] =
+      nat match {
+        case Z() => zero
+        case S(k) => succ(inject(k))
+      }
+
+  given reifyNat: Reify[Nat] with
     def reify(term: Term[Nat]): Nat =
       term match {
         case Term.Constructor("zero", _) => Nat.Z()

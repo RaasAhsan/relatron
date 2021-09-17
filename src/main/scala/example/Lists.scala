@@ -23,8 +23,15 @@ object Lists {
           append(at, cons(h, nil), y) && reverse(t, at)
         }
       }
-  
-  given listReify[A](using RA: Reify[A]): Reify[List[A]] with
+
+  given injectList[A](using RA: Inject[A]): Inject[List[A]] with
+    def inject(list: List[A]): Term[List[A]] =
+      list match {
+        case Nil => nil[A]
+        case h :: t => cons(RA.inject(h), inject(t))
+      }
+
+  given reifyList[A](using RA: Reify[A]): Reify[List[A]] with
     def reify(term: Term[List[A]]): List[A] =
       term match {
         case Term.Constructor("nil", _) => Nil

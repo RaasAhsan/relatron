@@ -56,6 +56,10 @@ object Core extends Syntax {
     }
   }
 
+  trait Inject[T] {
+    def inject(t: T): Term[T]
+  }
+
   trait Reify[T] {
     def reify(term: Term[T]): T
   }
@@ -114,7 +118,11 @@ object Core extends Syntax {
     go(goal, init)
   }
 
-  given intReify: Reify[Int] with
+  given injectInt: Inject[Int] with
+    def inject(i: Int): Term[Int] =
+      Term.Value(i)
+
+  given reifyInt: Reify[Int] with
     def reify(term: Term[Int]): Int =
       term match {
         case Term.Value(x) => x.asInstanceOf[Int]
