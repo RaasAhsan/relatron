@@ -6,7 +6,7 @@ import Core._
 def main(): Unit = {
   import Lists.{given, *}
   // import Nats.{given, *}
-  import interpreter.ArithmeticEvaluator.{given, *}
+  import arithmetic.{given, *}
 
   // val r1 = run[Nat] { x =>
   //   fresh[Nat, Nat] { (y, z) => 
@@ -29,8 +29,12 @@ def main(): Unit = {
   // }
 
   try {
+    // val r2 = run[Node] { x =>
+    //   multiEval(x, falseBool)
+    // }
+
     val r2 = run[Node] { x =>
-      multiEval(x, falseBool)
+      typing(x, typeNat)
     }
     println(r2.take(10).toList)
   } catch {
