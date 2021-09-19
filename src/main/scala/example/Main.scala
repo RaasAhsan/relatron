@@ -5,13 +5,7 @@ import Core._
 @main
 def main(): Unit = {
   import stdlib.all.{given, *}
-  import arithmetic.all.{given, *}
-
-  // val r1 = run[Nat] { x =>
-  //   fresh[Nat, Nat] { (y, z) => 
-  //     z === zero && y === succ(zero) && plus(z, x, y)
-  //   }
-  // }
+  // import arithmetic.all.{given, *}
 
   // println(r1.take(10).toList)
 
@@ -28,13 +22,17 @@ def main(): Unit = {
   // }
 
   try {
-    val r2 = run[Node] { x =>
-      eval(x, falseBool)
-    }
+    // val r2 = run[Node] { x =>
+    //   eval(x, falseBool)
+    // }
 
     // val r2 = run[Type] { x =>
     //   typing(test(falseBool, zero, succ(zero)), x)
     // }
+
+    val r2 = run[Nat, Nat] { (x, y) =>
+      mult(y, x, succ(zero))
+    }
     println(r2.take(50).toList)
   } catch {
     case t =>

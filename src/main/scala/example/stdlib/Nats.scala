@@ -33,12 +33,17 @@ trait Nats {
         case _ => throw new RuntimeException("invalid reification")
       }
 
-  def plus(a: Term[Nat], b: Term[Nat], c: Term[Nat]): Goal = {
+  def plus(a: Term[Nat], b: Term[Nat], c: Term[Nat]): Goal =
     (a === zero && b === c) ||
       fresh[Nat, Nat] { (pa, pc) =>
         a === succ(pa) && c === succ(pc) && plus(pa, b, pc)
       }
-    }
+
+  def mult(a: Term[Nat], b: Term[Nat], c: Term[Nat]): Goal =
+    (a === zero && c === zero && nat(b)) ||
+      fresh[Nat, Nat] { (k, m) => 
+        a === succ(k) && plus(b, m, c) && mult(k, b, m)
+      }
 
   // Constructive definition of nats... should we automatically infer this somehow?
   def nat(a: Term[Nat]): Goal =
