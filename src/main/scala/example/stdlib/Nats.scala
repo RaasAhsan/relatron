@@ -40,7 +40,8 @@ trait Nats {
       }
 
   def mult(a: Term[Nat], b: Term[Nat], c: Term[Nat]): Goal =
-    (a === zero && c === zero && nat(b)) ||
+    (a === zero && c === zero) ||
+    fresh[Nat] { k => a === succ(k) && b === zero && c === zero } ||
       fresh[Nat, Nat] { (k, m) => 
         a === succ(k) && plus(b, m, c) && mult(k, b, m)
       }

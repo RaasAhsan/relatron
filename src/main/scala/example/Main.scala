@@ -30,8 +30,8 @@ def main(): Unit = {
     //   typing(test(falseBool, zero, succ(zero)), x)
     // }
 
-    val r2 = run[Nat, Nat] { (x, y) =>
-      mult(y, x, succ(zero))
+    val r2 = run[Nat] { (x) =>
+      mult(succ(zero), succ(zero), x)
     }
     println(r2.take(50).toList)
   } catch {
