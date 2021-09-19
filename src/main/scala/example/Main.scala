@@ -4,8 +4,8 @@ import Core._
 
 @main
 def main(): Unit = {
-  import stdlib.{given, *}
-  import arithmetic.{given, *}
+  import stdlib.all.{given, *}
+  import arithmetic.all.{given, *}
 
   // val r1 = run[Nat] { x =>
   //   fresh[Nat, Nat] { (y, z) => 
