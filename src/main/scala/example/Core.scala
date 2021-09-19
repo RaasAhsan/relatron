@@ -17,11 +17,8 @@ object Core extends Syntax {
     def ===(that: Term[T]): Goal =
       Goal.Unify(Term.Value(t), that)
 
-  def value[A](a: A): Term[A] =
-    Term.Value[A](a)
-
-  def int(i: Int): Term[Int] =
-    value[Int](i)
+  def lift[A](a: A)(using I: Inject[A]): Term[A] =
+    I.inject(a)
 
   // goal constructors: unification, call/fresh, disj and conj
   enum Goal:
