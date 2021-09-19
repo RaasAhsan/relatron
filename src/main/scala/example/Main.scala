@@ -29,16 +29,18 @@ def main(): Unit = {
   // }
 
   try {
-    // val r2 = run[Node] { x =>
-    //   eval(x, falseBool)
-    // }
-
-    val r2 = run[Type] { x =>
-      typing(test(falseBool, zero, succ(zero)), x)
+    val r2 = run[Node] { x =>
+      eval(x, falseBool)
     }
+
+    // val r2 = run[Type] { x =>
+    //   typing(test(falseBool, zero, succ(zero)), x)
+    // }
     println(r2.take(50).toList)
   } catch {
     case t =>
-      t.printStackTrace()
+      // t.printStackTrace()
+      println(t.getClass)
+      t.getStackTrace.take(100).foreach(println(_))
   }
 }

@@ -107,7 +107,8 @@ object Core extends Syntax {
           LazyList.from(unify(state, l, r))
         case Goal.Conj(l, r) => 
           // bind
-          go(l, state).flatMap(nstate => go(r(), nstate))
+          // go(l, state).flatMap(nstate => go(r(), nstate))
+          bind(go(l, state))(ns => go(r(), ns))
         case Goal.Disj(l, r) => 
           // mplus
           // go(l, state).lazyAppendedAll(go(r(), state))
@@ -118,6 +119,13 @@ object Core extends Syntax {
     val init = State(0, Map())
     go(goal, init)
   }
+
+  // Custom implementation of bind which interleaves
+  def bind[A, B](left: LazyList[A])(f: A => LazyList[B]): LazyList[B] =
+    left match {
+      case h #:: t => interleave(f(h), bind(t)(f))
+      case LazyList() => LazyList()
+    }
 
   def interleave[A](left: LazyList[A], right: => LazyList[A]): LazyList[A] = 
     left match {
