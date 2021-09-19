@@ -1,7 +1,5 @@
 object Boilerplate {
   
-  // TODO: clean up nesting
-
   def fresh: String = {
     val methodDecls = (0 until 22).map { k =>
       val typeParams = (0 to k).map(i => s"A$i")

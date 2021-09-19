@@ -1,8 +1,10 @@
-# scalalogic
+# relatron
 
-A typed embedding of miniKanren in Scala 3.
+A typed logic programming library for Scala based on µkanren.
 
 ### Features
-* Natural numbers (peano encoding)
+* Natural numbers
 * Lists
-* Arithmetic expression interpreters
+* Arithmetic expressions
+  * Evaluation
+  * Typing
