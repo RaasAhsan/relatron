@@ -29,16 +29,16 @@ def main(): Unit = {
   // }
 
   try {
-    // val r2 = run[Node] { x =>
-    //   multiEval(x, falseBool)
-    // }
-
     val r2 = run[Node] { x =>
-      typing(x, typeNat)
+      multiEval(x, falseBool)
     }
+
+    // val r2 = run[Node] { x =>
+    //   typing(x, typeNat)
+    // }
     println(r2.take(10).toList)
   } catch {
     case t =>
-      println(t.getStackTrace.take(50).toList)
+      t.printStackTrace()
   }
 }

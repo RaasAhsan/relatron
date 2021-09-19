@@ -110,13 +110,20 @@ object Core extends Syntax {
           go(l, state).flatMap(nstate => go(r(), nstate))
         case Goal.Disj(l, r) => 
           // mplus
-          go(l, state).lazyAppendedAll(go(r(), state))
-          // go(r(), state).lazyAppendedAll(go(l, state))
+          // go(l, state).lazyAppendedAll(go(r(), state))
+          // complete search strategy: binary trampolining to interleave states from disjoint streams
+          interleave(go(l, state), go(r(), state))
       }
 
     val init = State(0, Map())
     go(goal, init)
   }
+
+  def interleave[A](left: LazyList[A], right: => LazyList[A]): LazyList[A] = 
+    left match {
+      case h #:: t => h #:: interleave(right, t)
+      case LazyList() => right
+    }
 
   given injectInt: Inject[Int] with
     def inject(i: Int): Term[Int] =
