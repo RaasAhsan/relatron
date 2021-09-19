@@ -4,7 +4,7 @@ A typed logic programming library for Scala based on µkanren.
 
 ### Features
 * Standard library
-  * Natural numbers
+  * Natural numbers (Peano encoding)
   * Lists
 * Arithmetic expressions
   * Evaluation
