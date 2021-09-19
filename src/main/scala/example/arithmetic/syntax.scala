@@ -39,7 +39,10 @@ def node(n: Term[Node]): Goal =
   fresh[Node] { k => n === isZero(k) && node(k) } || 
   n === trueBool || 
   n === falseBool || 
-  fresh[Node, Node, Node] { (t1, t2, t3) => n === test(t1, t2, t3) }
+  fresh[Node, Node, Node] { (t1, t2, t3) => n === test(t1, t2, t3) && node(t1) && node(t2) && node(t3) }
+
+def numeric(n: Term[Node]): Goal =
+  n === zero || fresh[Node] { k => n === succ(k) && numeric(k) }
 
 given nodeReify: Reify[Node] with
   def reify(term: Term[Node]): Node =
