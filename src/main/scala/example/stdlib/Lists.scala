@@ -1,6 +1,7 @@
 package example
+package stdlib
 
-object Lists {
+trait Lists {
 
   import Core._
 

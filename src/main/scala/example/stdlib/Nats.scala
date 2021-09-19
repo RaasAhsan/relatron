@@ -1,6 +1,7 @@
 package example
+package stdlib
 
-object Nats {
+trait Nats {
   
   import Core._
 
