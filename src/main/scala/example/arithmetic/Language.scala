@@ -1,8 +1,9 @@
-package example.arithmetic
+package example
+package arithmetic
 
 trait Language {
 
-  import example.Core._
+  import Core._
 
   // Represents the evaluation of untyped arithmetic expressions which ranges over natural numbers and booleans
   // TAPL chapter 3
@@ -16,22 +17,30 @@ trait Language {
     case False
     case If(t1: Node, t2: Node, t3: Node)
 
+  private case object TermZeroTag extends ConstructorTag
+  private case object TermSuccTag extends ConstructorTag
+  private case object TermPredTag extends ConstructorTag
+  private case object TermIsZeroTag extends ConstructorTag
+  private case object TermTrueTag extends ConstructorTag
+  private case object TermFalseTag extends ConstructorTag
+  private case object TermIfTag extends ConstructorTag
+
   import Node._
 
   // TODO: try a pattern functor encoding, which may simplify injection of user-defined terms
-  def zero: Term[Node] = Term.Constructor("zero", Nil)
+  def zero: Term[Node] = Term.Constructor(TermZeroTag, Nil)
 
-  def succ(t: Term[Node]): Term[Node] = Term.Constructor("succ", List(t))
+  def succ(t: Term[Node]): Term[Node] = Term.Constructor(TermSuccTag, List(t))
 
-  def pred(t: Term[Node]): Term[Node] = Term.Constructor("pred", List(t))
+  def pred(t: Term[Node]): Term[Node] = Term.Constructor(TermPredTag, List(t))
 
-  def isZero(t: Term[Node]): Term[Node] = Term.Constructor("iszero", List(t))
+  def isZero(t: Term[Node]): Term[Node] = Term.Constructor(TermIsZeroTag, List(t))
 
-  def trueBool: Term[Node] = Term.Constructor("true", Nil)
+  def trueBool: Term[Node] = Term.Constructor(TermTrueTag, Nil)
 
-  def falseBool: Term[Node] = Term.Constructor("false", Nil)
+  def falseBool: Term[Node] = Term.Constructor(TermFalseTag, Nil)
 
-  def test(t1: Term[Node], t2: Term[Node], t3: Term[Node]): Term[Node] = Term.Constructor("if", List(t1, t2, t3))
+  def test(t1: Term[Node], t2: Term[Node], t3: Term[Node]): Term[Node] = Term.Constructor(TermIfTag, List(t1, t2, t3))
 
   def node(n: Term[Node]): Goal = 
     n === zero ||
@@ -48,13 +57,13 @@ trait Language {
   given nodeReify: Reify[Node] with
     def reify(term: Term[Node]): Node =
       term match {
-        case Term.Constructor("zero", _) => Zero
-        case Term.Constructor("succ", t :: Nil) => Succ(reify(t.asInstanceOf[Term[Node]]))
-        case Term.Constructor("pred", t :: Nil) => Pred(reify(t.asInstanceOf[Term[Node]]))
-        case Term.Constructor("iszero", t :: Nil) => IsZero(reify(t.asInstanceOf[Term[Node]]))
-        case Term.Constructor("true", _) => True
-        case Term.Constructor("false", _) => False
-        case Term.Constructor("if", t1 :: t2 :: t3 :: Nil) => If(reify(t1.asInstanceOf[Term[Node]]), reify(t2.asInstanceOf[Term[Node]]), reify(t3.asInstanceOf[Term[Node]]))
+        case Term.Constructor(TermZeroTag, _) => Zero
+        case Term.Constructor(TermSuccTag, t :: Nil) => Succ(reify(t.asInstanceOf[Term[Node]]))
+        case Term.Constructor(TermPredTag, t :: Nil) => Pred(reify(t.asInstanceOf[Term[Node]]))
+        case Term.Constructor(TermIsZeroTag, t :: Nil) => IsZero(reify(t.asInstanceOf[Term[Node]]))
+        case Term.Constructor(TermTrueTag, _) => True
+        case Term.Constructor(TermFalseTag, _) => False
+        case Term.Constructor(TermIfTag, t1 :: t2 :: t3 :: Nil) => If(reify(t1.asInstanceOf[Term[Node]]), reify(t2.asInstanceOf[Term[Node]]), reify(t3.asInstanceOf[Term[Node]]))
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }
@@ -63,9 +72,12 @@ trait Language {
     case Nat
     case Bool
 
-  def typeNat: Term[Type] = Term.Constructor("type_nat", Nil)
+  private case object TypeNatTag extends ConstructorTag
+  private case object TypeBoolTag extends ConstructorTag
 
-  def typeBool: Term[Type] = Term.Constructor("type_bool", Nil)
+  def typeNat: Term[Type] = Term.Constructor(TypeNatTag, Nil)
+
+  def typeBool: Term[Type] = Term.Constructor(TypeBoolTag, Nil)
 
   def typeNode(ty: Term[Type]): Goal = 
     ty === typeNat ||
@@ -74,8 +86,8 @@ trait Language {
   given typeReify: Reify[Type] with
     def reify(term: Term[Type]): Type =
       term match {
-        case Term.Constructor("type_nat", _) => Type.Nat
-        case Term.Constructor("type_bool", _) => Type.Bool
+        case Term.Constructor(TypeNatTag, _) => Type.Nat
+        case Term.Constructor(TypeBoolTag, _) => Type.Bool
         case _ => throw new RuntimeException("invalid reification")
       }
 

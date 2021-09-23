@@ -5,11 +5,14 @@ trait Lists {
 
   import Core._
 
+  private case object NilTag extends ConstructorTag
+  private case object ConsTag extends ConstructorTag
+
   def nil[A]: Term[List[A]] =
-    Term.Constructor("nil", Nil)
+    Term.Constructor(NilTag, Nil)
 
   def cons[A](head: Term[A], tail: Term[List[A]]): Term[List[A]] =
-    Term.Constructor("cons", List(head, tail))
+    Term.Constructor(ConsTag, List(head, tail))
 
   def append[A](x: Term[List[A]], y: Term[List[A]], xy: Term[List[A]]): Goal =
     (x === nil[A] && y === xy) ||
@@ -35,8 +38,8 @@ trait Lists {
   given reifyList[A](using RA: Reify[A]): Reify[List[A]] with
     def reify(term: Term[List[A]]): List[A] =
       term match {
-        case Term.Constructor("nil", _) => Nil
-        case Term.Constructor("cons", h :: t :: Nil) => RA.reify(h.asInstanceOf[Term[A]]) :: reify(t.asInstanceOf[Term[List[A]]])
+        case Term.Constructor(NilTag, _) => Nil
+        case Term.Constructor(ConsTag, h :: t :: Nil) => RA.reify(h.asInstanceOf[Term[A]]) :: reify(t.asInstanceOf[Term[List[A]]])
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }

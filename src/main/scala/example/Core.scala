@@ -8,7 +8,7 @@ object Core extends Syntax {
   enum Term[+T]:
     case Variable(index: Int)
     case Value(value: Any)
-    case Constructor(name: String, terms: List[Term[Any]])
+    case Constructor(tag: ConstructorTag, terms: List[Term[Any]])
 
     def ===[U >: T](that: Term[U]): Goal =
       Goal.Unify(this, that)

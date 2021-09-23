@@ -11,11 +11,14 @@ trait Nats {
 
   import Nat._
 
+  private case object ZTag extends ConstructorTag
+  private case object STag extends ConstructorTag
+
   def zero: Term[Nat] = 
-    Term.Constructor("zero", Nil)
+    Term.Constructor(ZTag, Nil)
 
   def succ(k: Term[Nat]): Term[Nat] =
-    Term.Constructor("succ", List(k))
+    Term.Constructor(STag, List(k))
 
   given injectNat: Inject[Nat] with
     def inject(nat: Nat): Term[Nat] =
@@ -27,8 +30,8 @@ trait Nats {
   given reifyNat: Reify[Nat] with
     def reify(term: Term[Nat]): Nat =
       term match {
-        case Term.Constructor("zero", _) => Nat.Z()
-        case Term.Constructor("succ", t :: Nil) => Nat.S(reify(t.asInstanceOf[Term[Nat]]))
+        case Term.Constructor(ZTag, _) => Nat.Z()
+        case Term.Constructor(STag, t :: Nil) => Nat.S(reify(t.asInstanceOf[Term[Nat]]))
         case Term.Variable(_) => throw new RuntimeException("unbound variable")
         case _ => throw new RuntimeException("invalid reification")
       }
